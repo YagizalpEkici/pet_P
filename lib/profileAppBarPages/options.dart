@@ -27,6 +27,8 @@ class options extends StatefulWidget {
 
 class _optionsState extends State<options> {
   bool isSwitched = false;
+  AuthService auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,7 +100,10 @@ class _optionsState extends State<options> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: ElevatedButton(onPressed: (){}, child: Text('Log Out'), style: ElevatedButton.styleFrom(
+                  child: ElevatedButton(onPressed: (){
+
+
+                  }, child: Text('Log Out'), style: ElevatedButton.styleFrom(
                       minimumSize: Size(300.0, 50.0)
                   ),),
                 ),

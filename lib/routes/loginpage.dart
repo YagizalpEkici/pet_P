@@ -224,6 +224,8 @@ class _loginState extends State<login> {
                     ),
                   ],
                 ),
+
+                /*
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -258,6 +260,8 @@ class _loginState extends State<login> {
                     ),
                   ],
                 ),
+                */
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
