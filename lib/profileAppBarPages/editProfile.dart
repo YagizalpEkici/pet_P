@@ -1,16 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:pet_project/routes/homePage.dart';
+import 'package:pet_project/firestore_related/users.dart';
+
 
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 
 class editProfile extends StatefulWidget{
+
   @override
   _editProfile createState() => _editProfile();
 }
@@ -24,6 +26,8 @@ class _editProfile extends State<editProfile> {
   String sex = "";
   List<String> sexType = ["female", "male", "none"];
   String url = "";
+
+  user? currentUser;
 
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
@@ -58,6 +62,33 @@ class _editProfile extends State<editProfile> {
     }
   }
 
+  updateUserData() {
+    //bool priv;
+    setState(() {
+
+    });
+    FirebaseAuth _auth;
+    User? _user;
+    _auth = FirebaseAuth.instance;
+    _user = _auth.currentUser;
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(_user?.email)
+        .update({
+      "petName": petName,
+      "bio": bio,
+      "photoUrl": url,
+      "birthYear": birthYear,
+      "breed": breed,
+      "sex": sex,
+    })
+        .then((value) => print("User Updated"))
+        .catchError((error) => print("Failed to update user: $error"));
+
+    SnackBar successSnackBar =
+    SnackBar(content: Text("Profile has been updated."));
+  }
 
 
   @override
@@ -379,7 +410,7 @@ class _editProfile extends State<editProfile> {
                                         if (_formKey.currentState!.validate()) {
                                           print("route: homePage successful");
                                           _formKey.currentState!.save();
-
+                                          updateUserData();
                                           pageDirection();
                                         }
                                       },

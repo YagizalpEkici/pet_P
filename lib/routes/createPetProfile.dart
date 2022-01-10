@@ -4,6 +4,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pet_project/firestore_related/users.dart';
+import 'package:pet_project/firestore_related/users.dart';
 //import 'package:file/file.dart';
 import 'package:pet_project/utils/db.dart';
 
@@ -73,9 +75,22 @@ class _createPet extends State<createPet> {
   }
   void textPressed() {}
 
+  Future<void> addUser(user cUser) async {
+    final CollectionReference users = FirebaseFirestore.instance.collection('user');
+    try {
+      await users.doc(cUser.email).set(cUser.toJson());
+      //.then((value) => print("User Added"))
+      //.catchError((error) => print("Failed to add user: $error"));
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build (BuildContext context){
     final args = ModalRoute.of(context)!.settings.arguments as Map;
+    FirebaseAuth _auth;
+    _auth = FirebaseAuth.instance;
 
     return Scaffold(
         body: SafeArea(
@@ -359,17 +374,46 @@ class _createPet extends State<createPet> {
                                           },
                                         ),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_formKey.currentState!.validate()) {
                                           print("route: homePage successful");
                                           _formKey.currentState!.save();
-                                          if(_image != null) {
+                                          if (_image != null) {
                                             uploadImageToFirebase(context);
                                           }
-                                          db.addUserAutoID(args['username'],args['email'],args['name'],args['surname'],args['password'],args['repassword'],petName,bio,birthYear,breed,sex,url);
+                                          var result = await FirebaseFirestore
+                                              .instance
+                                              .collection('user')
+                                              .where(
+                                              'email', isEqualTo: args['email'])
+                                              .get();
+                                          if (result.size == 0) {
+                                            FirebaseAuth _auth;
+                                            _auth = FirebaseAuth.instance;
+                                            User? _user = _auth.currentUser;
+                                            user cUser = user(
+                                              username: args['username'],
+                                              name: args['name'],
+                                              surname: args['surname'],
+                                              bio: bio,
+                                              photoUrl: url,
+                                              password: args['password'],
+                                              sex: sex,
+                                              birthYear: birthYear,
+                                              breed: breed,
+                                              petName: petName,
+                                              followers: [],
+                                              following: [],
+                                              posts: [],
+                                              email: args['email'],
+                                              profType: true,
+                                            );
 
-                                          //_setCurrentScreen();
-                                          pageDirection();
+                                            addUser(cUser);
+                                            //db.addUserAutoID(args['username'],args['email'],args['name'],args['surname'],args['password'],args['repassword'],petName,bio,birthYear,breed,sex,url);
+                                            //_setCurrentScreen();
+                                            pageDirection();
+                                          }
                                         }
                                       },
                                       child: Text(

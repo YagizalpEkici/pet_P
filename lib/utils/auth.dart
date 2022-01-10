@@ -35,7 +35,7 @@ class AuthService {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: mail, password: pass);
       User user = result.user!;
-      //return _userFromFirebase(user);
+      return _userFromFirebase(user);
     } on FirebaseAuthException catch (e) {
       print(e.toString());
       return null;
