@@ -2,6 +2,7 @@ import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:pet_project/routes/search.dart';
 import 'package:pet_project/unfinished_proifle_and_feed/HomeScreen.dart';
+import 'package:pet_project/unfinished_proifle_and_feed/privateOtherProfile.dart';
 import 'package:pet_project/unfinished_proifle_and_feed/profilePage.dart';
 
 import 'form.dart';

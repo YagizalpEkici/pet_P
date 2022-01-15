@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pet_project/profileAppBarPages/options.dart';
+import 'package:pet_project/unfinished_proifle_and_feed/privateOtherProfile.dart';
 import 'package:pet_project/unfinished_proifle_and_feed/post.dart';
 import 'package:pet_project/unfinished_proifle_and_feed/useragreement.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +85,7 @@ class NavigationDrawerWidget extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => options(),));
         break;
       case 2:
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => useragreement(),));
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => otherprofilePage(),));
         break;
       case 3:
         Navigator.of(context).push(MaterialPageRoute(builder: (context) => communityrules(),));

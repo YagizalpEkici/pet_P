@@ -1,5 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:pet_project/firestore_related/users.dart';
+import 'package:pet_project/routes/loginpage.dart';
 import 'package:pet_project/unfinished_proifle_and_feed/post.dart';
 import 'package:provider/provider.dart';
 import 'package:email_validator/email_validator.dart';
@@ -21,6 +24,7 @@ import 'package:pet_project/routes/homePage.dart';
 class options extends StatefulWidget {
   const options({Key? key}) : super(key: key);
 
+
   @override
   State<options> createState() => _optionsState();
 }
@@ -29,7 +33,128 @@ class _optionsState extends State<options> {
   bool isSwitched = false;
   AuthService auth = AuthService();
 
+
+
+  String userMail = "";
+  String senderId = "";
+  String type = "";
+  String postId = "";
+  String userName = "";
+  String fullName = "";
+  String photoURL = "";
+  String activation = "";
+  String surname = "";
+  List<dynamic> followers = [];
+  String password = "";
+  List<dynamic> following = [];
+  List<dynamic> posts = [];
+  String bio = "";
+  String petName = "";
+  String birthYear = "";
+  String sex = "";
+  String breed = "";
+
+
+
+
+  user? currentUser;
+  bool profType = true;
+
+
+  void _loadtheuser() async{
+    FirebaseAuth _auth;
+    User _user;
+    _auth = FirebaseAuth.instance;
+    _user = _auth.currentUser!;
+
+    var dbUserGetter = await FirebaseFirestore.instance.collection('user').where('email', isEqualTo: _user.email).get();
+
+
+    setState(() {
+      userName = dbUserGetter.docs[0]['username'];
+      //print(userName);
+      fullName = dbUserGetter.docs[0]['name'];
+      photoURL = dbUserGetter.docs[0]['photoUrl'];
+      userMail = dbUserGetter.docs[0]['email'];
+      profType = dbUserGetter.docs[0]['profType'];
+      surname = dbUserGetter.docs[0]['surname'];
+      followers = dbUserGetter.docs[0]['followers'];
+      password = dbUserGetter.docs[0]['password'];
+      following = dbUserGetter.docs[0]['following'];
+      posts = dbUserGetter.docs[0]['posts'];
+      bio = dbUserGetter.docs[0]['bio'];
+      petName = dbUserGetter.docs[0]['petName'];
+      birthYear = dbUserGetter.docs[0]['birthYear'];
+      sex = dbUserGetter.docs[0]['sex'];
+      breed = dbUserGetter.docs[0]['breed'];
+    });
+  }
+
+
+  changeProfType(bool ifso) {
+    setState(() {
+
+    });
+    FirebaseAuth _auth;
+    User? _user;
+    _auth = FirebaseAuth.instance;
+    _user = _auth.currentUser;
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(_user?.email)
+        .update({
+      "profType": ifso,
+    })
+
+        .then((value) => print("User Updated"))
+        .catchError((error) => print("Failed to update user: $error"));
+
+
+
+
+    SnackBar successSnackBar =
+    SnackBar(content: Text("Profile has been updated."));
+  }
+
+  deactivateAccount() {
+    setState(() {
+
+    });
+    FirebaseAuth _auth;
+    User? _user;
+    _auth = FirebaseAuth.instance;
+    _user = _auth.currentUser;
+
+    FirebaseFirestore.instance
+        .collection('user')
+        .doc(_user?.email)
+        .update({
+      "activation": false,
+    })
+
+        .then((value) => print("User Updated"))
+        .catchError((error) => print("Failed to update user: $error"));
+
+
+
+
+    SnackBar successSnackBar =
+    SnackBar(content: Text("Profile has been updated."));
+  }
+
+
+
+
+  final AuthService _auth = AuthService();
+
   @override
+
+  void initState(){
+    super.initState();
+    _loadtheuser();
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -58,6 +183,7 @@ class _optionsState extends State<options> {
                           onChanged: (value) {
                             setState(() {
                               isSwitched = value;
+                              changeProfType(isSwitched);
                               print(isSwitched);
                             });
                           },
@@ -89,9 +215,42 @@ class _optionsState extends State<options> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: ElevatedButton(onPressed: (){}, child: Text('Deactivate Your Account'), style: ElevatedButton.styleFrom(
-                      minimumSize: Size(300.0, 50.0)
-                  ),),
+                  child: ElevatedButton(onPressed: () => showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) => AlertDialog(
+                      title: const Text('Deactivate Account'),
+                      content: const Text('You are about to deactivate your account, are you sure?'),
+                      actions: <Widget>[
+                        TextButton(
+                          onPressed: (){
+                            deactivateAccount();
+                            Navigator.pop(context, 'Yes');
+                          },
+                          child: const Text('Yes'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, 'No'),
+                          child: const Text('No'),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                    /*
+                    AlertDialog(
+                      title: Text('ŞŞŞŞŞ Accountu siliyosun'),
+                      actions: [
+                        FlatButton(onPressed: (){}, child: Text('Yes')),
+                        FlatButton(onPressed: (){}, child: Text('No'))
+                      ],
+                    );
+                    */
+
+
+                    child: Text('Deactivate Account'), style: ElevatedButton.styleFrom(
+                      minimumSize: Size(300.0, 50.0),
+
+                    ),),
                 ),
               ],
             ),
@@ -100,10 +259,13 @@ class _optionsState extends State<options> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(30.0),
-                  child: ElevatedButton(onPressed: (){
-
-
-                  }, child: Text('Log Out'), style: ElevatedButton.styleFrom(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      await _auth.signOut().then((result) {
+                        Navigator.of(context).pop(true);
+                      });
+                    },
+                    child: Text('Log Out'), style: ElevatedButton.styleFrom(
                       minimumSize: Size(300.0, 50.0)
                   ),),
                 ),
@@ -121,7 +283,10 @@ class _optionsState extends State<options> {
                       content: const Text('You are about to delete your account permanently, are you sure?'),
                       actions: <Widget>[
                         TextButton(
-                          onPressed: () => Navigator.pop(context, 'Yes'),
+                          onPressed: (){
+                            FirebaseAuth.instance.currentUser!.delete();
+                            Navigator.pop(context, 'Yes');
+                          },
                           child: const Text('Yes'),
                         ),
                         TextButton(
